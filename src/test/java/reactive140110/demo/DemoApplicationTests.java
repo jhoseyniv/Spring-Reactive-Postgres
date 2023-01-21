@@ -143,4 +143,67 @@ class DemoApplicationTests {
 				.verifyComplete();
 	}
 
+	@Test
+	public void skipAFew() {
+		Flux<String> countFlux = Flux.just(
+						"one", "two", "skip a few", "ninety nine", "one hundred")
+				.skip(3);
+		StepVerifier.create(countFlux)
+				.expectNext("ninety nine", "one hundred")
+				.verifyComplete();
+	}
+
+	@Test
+	public void skipAFewSeconds() {
+		Flux<String> countFlux = Flux.just(
+						"one", "two", "skip a few", "ninety nine", "one hundred")
+				.delayElements(Duration.ofSeconds(1))
+				.skip(Duration.ofSeconds(4));
+		StepVerifier.create(countFlux)
+				.expectNext("ninety nine", "one hundred")
+				.verifyComplete();
+	}
+
+	//Take Operation Shows the first n item from the Flux Stream Data --- The opposit of Skip
+	@Test
+	public void take() {
+		Flux<String> nationalParkFlux = Flux.just(
+						"Yellowstone", "Yosemite", "Grand Canyon", "Zion", "Acadia")
+				.take(3);
+		StepVerifier.create(nationalParkFlux)
+				.expectNext("Yellowstone", "Yosemite", "Grand Canyon")
+				.verifyComplete();
+	}
+	@Test
+	public void takeForAwhile() {
+
+		Flux<String> nationalParkFlux = Flux.just(
+						"Yellowstone", "Yosemite", "Grand Canyon", "Zion", "Grand Teton")
+				.delayElements(Duration.ofSeconds(1))
+				.take(Duration.ofMillis(3500));
+		StepVerifier.create(nationalParkFlux)
+				.expectNext("Yellowstone", "Yosemite", "Grand Canyon")
+				.verifyComplete();
+	}
+
+	@Test
+	public void filter() {
+		Flux<String> nationalParkFlux = Flux.just(
+						"Yellowstone", "Yosemite", "Grand Canyon", "Zion", "Grand Teton")
+				.filter(np -> !np.contains(" "));
+		StepVerifier.create(nationalParkFlux)
+				.expectNext("Yellowstone", "Yosemite", "Zion")
+				.verifyComplete();
+	}
+
+	//In the following test, only unique String values will be emitted from the distinct Flux:
+	@Test
+	public void distinct() {
+		Flux<String> animalFlux = Flux.just(
+						"dog", "cat", "bird", "dog", "bird", "anteater")
+				.distinct();
+		StepVerifier.create(animalFlux)
+				.expectNext("dog", "cat", "bird", "anteater")
+				.verifyComplete();
+	}
 }
